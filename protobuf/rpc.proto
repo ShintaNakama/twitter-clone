@@ -1,0 +1,88 @@
+syntax = "proto3";
+package pb;
+
+option go_package = "github.com/ShintaNakame/twitter-clone/backend/pb;pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+message User {
+  string id    = 1;
+  string email = 2;
+  string name  = 3;
+  string image = 4;
+}
+
+message Profile {
+  string user_id                     = 1;
+  string description                 = 2;
+  google.protobuf.Timestamp birthday = 3;
+  string location                    = 4;
+  string gender                      = 5;
+}
+
+message Post {
+  string id                           = 1;
+  string user_id                      = 2;
+  string body                         = 3;
+  google.protobuf.Timestamp posted_at = 4;
+}
+
+message Image {
+  string id   = 1;
+  string name = 2;
+}
+
+message Posts {
+  repeated Post posts = 1;
+}
+
+message Images {
+  repeated Image images = 1;
+}
+
+message CreateUserRequest {
+  string id    = 1;
+  string email = 2;
+  string name  = 3;
+}
+
+message UpdateUserRequest {
+  string id    = 1;
+  string email = 2;
+  string name  = 3;
+  string image = 4;
+}
+
+message PutProfileRequest {
+  string user_id                     = 1;
+  string description                 = 2;
+  google.protobuf.Timestamp birthday = 3;
+  string location                    = 4;
+  string gender                      = 5;
+}
+
+message ListUserPostsRequest {
+  string user_id = 1;
+}
+
+message GetPostRequest {
+  string post_id = 1;
+}
+
+message CreatePostRequest {
+  string id      = 1;
+  string user_id = 2;
+  string body    = 3;
+  Images images  = 4;
+}
+
+service twitterClone {
+  rpc CreateUser(CreateUserRequest) returns (google.protobuf.Empty);
+  //rpc UpdateUser(UpdateUserRequest) returns (User);
+  //rpc PutProfile(PutProfileRequest) returns (Profile);
+  rpc ListUserPosts(ListUserPostsRequest) returns (Posts);
+  rpc GetPost(GetPostRequest) returns (Post);
+  //rpc GetPostImages(GetPostRequest) returns (Images);
+  rpc CreatePost(CreatePostRequest) returns (google.protobuf.Empty);
+}

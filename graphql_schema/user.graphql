@@ -1,0 +1,43 @@
+"""
+user
+"""
+type User {
+  """
+  ID
+  """
+  id: ID!
+  """
+  email
+  """
+  email: String!
+  """
+  name
+  """
+  name: String!
+  """
+  image
+  """
+  image: String!
+}
+
+"""
+user input
+"""
+input UserInput {
+  """
+  ID
+  """
+  id: ID!
+  """
+  email
+  """
+  email: String!
+  """
+  name
+  """
+  name: String!
+  """
+  image
+  """
+  image: String!
+}

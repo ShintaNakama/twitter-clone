@@ -1,0 +1,31 @@
+"""
+Query
+"""
+type Query {
+  """
+  投稿リスト
+  """
+  postList: [Post!]!
+  """
+  投稿
+  """
+  post(id :ID!): Post!
+}
+
+"""
+Mutation
+"""
+type Mutation {
+  """
+  ユーザー作成
+  """
+  createUser(input: UserInput): Boolean!
+  """
+  投稿作成
+  """
+  createPost(input: PostInput): Boolean!
+  """
+  投稿削除
+  """
+  deletePost(id: ID!): Boolean!
+}

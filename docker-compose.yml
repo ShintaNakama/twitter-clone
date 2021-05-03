@@ -1,0 +1,13 @@
+version: '3'
+services:
+  mysql:
+    image: "mysql:5.7"
+    ports:
+      - "53306:3306"
+    volumes:
+      - twitter-clone/db/data/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: "twitter_clone_db"
+      MYSQL_ROOT_PASSWORD: "twitter"
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
