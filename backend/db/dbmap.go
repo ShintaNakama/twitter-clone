@@ -5,12 +5,11 @@ import (
 	"os"
 
 	"github.com/ShintaNakama/twitter-clone/backend/app/infra/db/models"
-	"github.com/ShintaNakama/twitter-clone/backend/env"
 	"github.com/go-gorp/gorp"
 )
 
 func GetDbMap() (*gorp.DbMap, error) {
-	db, err := EstablishConnection(env.DSN())
+	db, err := EstablishConnection()
 	if err != nil {
 		return nil, err
 	}

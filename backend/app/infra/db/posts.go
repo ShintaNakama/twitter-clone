@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ShintaNakama/twitter-clone/backend/app/domain/entity"
 	"github.com/ShintaNakama/twitter-clone/backend/app/domain/repository"
@@ -26,7 +27,27 @@ func NewPostsRepository(conn gorp.SqlExecutor) repository.PostsRepository {
 	return &postsImpl{exec: conn}
 }
 
-func (r *postsImpl) ListUserPosts(ctx context.Context, userID string) ([]*entity.Post, error) {
+func (r *postsImpl) List(ctx context.Context) ([]*entity.Post, error) {
+	var posts []*models.Post
+	q := fmt.Sprintf("SELECT %s FROM posts ORDER BY posted_at DESC LIMIT ?", postsColumns)
+	_, err := r.exec.Select(&posts, q, defaultListPostLimit)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]*entity.Post, len(posts))
+	for i, p := range posts {
+		res[i] = entity.NewPost(&entity.PostArgs{
+			ID:       p.ID,
+			UserID:   p.UserID,
+			Body:     p.Body,
+			PostedAt: p.PostedAt,
+		})
+	}
+	return res, nil
+}
+
+func (r *postsImpl) ListByUser(ctx context.Context, userID string) ([]*entity.Post, error) {
 	var posts []*models.Post
 	q := "SELECT * FROM posts WHERE user_id = ? ORDER BY posted_at DESC LIMIT ?"
 
@@ -45,6 +66,23 @@ func (r *postsImpl) ListUserPosts(ctx context.Context, userID string) ([]*entity
 		})
 	}
 	return res, nil
+}
+
+func (r *postsImpl) Get(ctx context.Context, id string) (*entity.Post, error) {
+	var post *models.Post
+	q := fmt.Sprintf("SELECT %s FROM posts WHERE id = ?", postsColumns)
+
+	err := r.exec.SelectOne(&post, q, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return entity.NewPost(&entity.PostArgs{
+		ID:       post.ID,
+		UserID:   post.UserID,
+		Body:     post.Body,
+		PostedAt: post.PostedAt,
+	}), nil
 }
 
 func (r *postsImpl) Insert(ctx context.Context, post *entity.Post) error {

@@ -62,7 +62,7 @@ message PutProfileRequest {
   string gender                      = 5;
 }
 
-message ListUserPostsRequest {
+message ListPostRequest {
   string user_id = 1;
 }
 
@@ -81,7 +81,7 @@ service twitterClone {
   rpc CreateUser(CreateUserRequest) returns (google.protobuf.Empty);
   //rpc UpdateUser(UpdateUserRequest) returns (User);
   //rpc PutProfile(PutProfileRequest) returns (Profile);
-  rpc ListUserPosts(ListUserPostsRequest) returns (Posts);
+  rpc ListPost(ListPostRequest) returns (Posts);
   rpc GetPost(GetPostRequest) returns (Post);
   //rpc GetPostImages(GetPostRequest) returns (Images);
   rpc CreatePost(CreatePostRequest) returns (google.protobuf.Empty);

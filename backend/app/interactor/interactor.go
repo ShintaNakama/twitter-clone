@@ -35,8 +35,16 @@ func (i *interactor) NewApi() *api {
 	return api
 }
 
+func (i *interactor) NewUsersRepository() repository.UsersRepository {
+	return db.NewUsersRepository(i.conn)
+}
+
 func (i *interactor) NewPostsRepository() repository.PostsRepository {
 	return db.NewPostsRepository(i.conn)
+}
+
+func (i *interactor) NewUsersUsecase() usecase.UsersUsecase {
+	return usecase.NewUsersUsecase(i.NewUsersRepository())
 }
 
 func (i *interactor) NewPostsUsecase() usecase.PostsUsecase {
@@ -44,5 +52,5 @@ func (i *interactor) NewPostsUsecase() usecase.PostsUsecase {
 }
 
 func (i *interactor) NewTwitterCloneServer() presentation.TwitterCloneServer {
-	return presentation.NewTwitterCloneServer(i.NewPostsUsecase())
+	return presentation.NewTwitterCloneServer(i.NewUsersUsecase(), i.NewPostsUsecase())
 }

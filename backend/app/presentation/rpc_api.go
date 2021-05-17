@@ -10,26 +10,28 @@ import (
 )
 
 type TwitterCloneServer interface {
-	ListUserPosts(context.Context, *pb.ListUserPostsRequest) (*pb.Posts, error)
+	ListPost(context.Context, *pb.ListPostRequest) (*pb.Posts, error)
 	GetPost(context.Context, *pb.GetPostRequest) (*pb.Post, error)
 	CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*empty.Empty, error)
 	CreatePost(ctx context.Context, req *pb.CreatePostRequest) (*empty.Empty, error)
 }
 
 type twitterCloneServer struct {
-	usecase  usecase.PostsUsecase
-	postConv conv.PostConv
+	usersUsecase usecase.UsersUsecase
+	postsUsecase usecase.PostsUsecase
+	postConv     conv.PostConv
 }
 
-func NewTwitterCloneServer(usecase usecase.PostsUsecase) TwitterCloneServer {
+func NewTwitterCloneServer(u usecase.UsersUsecase, p usecase.PostsUsecase) TwitterCloneServer {
 	return &twitterCloneServer{
-		usecase:  usecase,
-		postConv: conv.PostConv{},
+		usersUsecase: u,
+		postsUsecase: p,
+		postConv:     conv.PostConv{},
 	}
 }
 
-func (s *twitterCloneServer) ListUserPosts(ctx context.Context, req *pb.ListUserPostsRequest) (*pb.Posts, error) {
-	posts, err := s.usecase.ListUserPosts(ctx, req.GetUserId())
+func (s *twitterCloneServer) ListPost(ctx context.Context, req *pb.ListPostRequest) (*pb.Posts, error) {
+	posts, err := s.postsUsecase.List(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -38,10 +40,25 @@ func (s *twitterCloneServer) ListUserPosts(ctx context.Context, req *pb.ListUser
 }
 
 func (s *twitterCloneServer) GetPost(ctx context.Context, req *pb.GetPostRequest) (*pb.Post, error) {
-	return &pb.Post{}, nil
+	post, err := s.postsUsecase.Get(ctx, req.GetPostId())
+	if err != nil {
+		return nil, err
+	}
+
+	return s.postConv.ToPb(post), nil
 }
 
 func (s *twitterCloneServer) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*empty.Empty, error) {
+	in := &usecase.UserInput{
+		ID:    req.GetId(),
+		Name:  req.GetName(),
+		Email: req.GetEmail(),
+	}
+
+	if err := s.usersUsecase.CreateUser(ctx, in); err != nil {
+		return nil, err
+	}
+
 	return &empty.Empty{}, nil
 }
 
@@ -52,7 +69,7 @@ func (s *twitterCloneServer) CreatePost(ctx context.Context, req *pb.CreatePostR
 		Body:   req.GetBody(),
 	}
 
-	if err := s.usecase.CreatePost(ctx, in); err != nil {
+	if err := s.postsUsecase.Create(ctx, in); err != nil {
 		return nil, err
 	}
 

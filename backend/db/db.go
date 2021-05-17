@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"time"
 
@@ -16,8 +17,8 @@ const (
 )
 
 // EstablishConnection DB接続を確立する
-func EstablishConnection(dsn string) (*sql.DB, error) {
-	db, err := sql.Open(driver, dsn)
+func EstablishConnection() (*sql.DB, error) {
+	db, err := sql.Open(driver, dsn())
 	if err != nil {
 		return nil, err
 	}
@@ -38,5 +39,6 @@ func CloseConnection(conn *sql.DB) {
 
 // DSN データソース名を取得する
 func dsn() string {
+	fmt.Println(env.DSN() + options)
 	return env.DSN() + options
 }

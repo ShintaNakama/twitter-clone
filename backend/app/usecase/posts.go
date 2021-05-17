@@ -9,9 +9,9 @@ import (
 )
 
 type PostsUsecase interface {
-	ListUserPosts(ctx context.Context, userID string) ([]*Post, error)
-	GetPost(ctx context.Context, postID string) (*Post, error)
-	CreatePost(ctx context.Context, input *PostInput) error
+	List(ctx context.Context) ([]*Post, error)
+	Get(ctx context.Context, postID string) (*Post, error)
+	Create(ctx context.Context, input *PostInput) error
 }
 
 type postsUsecase struct {
@@ -24,8 +24,8 @@ func NewPostsUsecase(r repository.PostsRepository) PostsUsecase {
 	}
 }
 
-func (u *postsUsecase) ListUserPosts(ctx context.Context, userID string) ([]*Post, error) {
-	posts, err := u.repo.ListUserPosts(ctx, userID)
+func (u *postsUsecase) List(ctx context.Context) ([]*Post, error) {
+	posts, err := u.repo.List(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -41,11 +41,39 @@ func (u *postsUsecase) ListUserPosts(ctx context.Context, userID string) ([]*Pos
 	return res, nil
 }
 
-func (u *postsUsecase) GetPost(ctx context.Context, userID string) (*Post, error) {
-	return &Post{}, nil
+func (u *postsUsecase) ListUserPosts(ctx context.Context, userID string) ([]*Post, error) {
+	posts, err := u.repo.ListByUser(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]*Post, len(posts))
+	for i, p := range posts {
+		res[i] = &Post{
+			ID:       p.GetID(),
+			UserID:   p.GetUserID(),
+			Body:     p.GetBody(),
+			PostedAt: p.GetPostedAt(),
+		}
+	}
+	return res, nil
 }
 
-func (u *postsUsecase) CreatePost(ctx context.Context, input *PostInput) error {
+func (u *postsUsecase) Get(ctx context.Context, id string) (*Post, error) {
+	p, err := u.repo.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Post{
+		ID:       p.GetID(),
+		UserID:   p.GetUserID(),
+		Body:     p.GetBody(),
+		PostedAt: p.GetPostedAt(),
+	}, nil
+}
+
+func (u *postsUsecase) Create(ctx context.Context, input *PostInput) error {
 	p := entity.NewPost(&entity.PostArgs{
 		ID:       input.ID,
 		UserID:   input.UserID,
