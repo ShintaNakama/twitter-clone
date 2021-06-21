@@ -77,8 +77,18 @@ message CreatePostRequest {
   Images images  = 4;
 }
 
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message GetUserByPostIDRequest {
+  string post_id = 1;
+}
+
 service twitterClone {
   rpc CreateUser(CreateUserRequest) returns (google.protobuf.Empty);
+  rpc GetUser(GetUserRequest) returns (User);
+  rpc GetUserByPostID(GetUserByPostIDRequest) returns (User);
   //rpc UpdateUser(UpdateUserRequest) returns (User);
   //rpc PutProfile(PutProfileRequest) returns (Profile);
   rpc ListPost(ListPostRequest) returns (Posts);

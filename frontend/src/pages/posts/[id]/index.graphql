@@ -1,0 +1,6 @@
+query DetailPageGetData($id: ID!) {
+  post(id: $id) {
+    ...PostDetail
+  }
+}
+

@@ -12,6 +12,8 @@ import (
 type TwitterCloneServer interface {
 	ListPost(context.Context, *pb.ListPostRequest) (*pb.Posts, error)
 	GetPost(context.Context, *pb.GetPostRequest) (*pb.Post, error)
+	GetUser(context.Context, *pb.GetUserRequest) (*pb.User, error)
+	GetUserByPostID(context.Context, *pb.GetUserByPostIDRequest) (*pb.User, error)
 	CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*empty.Empty, error)
 	CreatePost(ctx context.Context, req *pb.CreatePostRequest) (*empty.Empty, error)
 }
@@ -20,6 +22,7 @@ type twitterCloneServer struct {
 	usersUsecase usecase.UsersUsecase
 	postsUsecase usecase.PostsUsecase
 	postConv     conv.PostConv
+	userConv     conv.UserConv
 }
 
 func NewTwitterCloneServer(u usecase.UsersUsecase, p usecase.PostsUsecase) TwitterCloneServer {
@@ -46,6 +49,24 @@ func (s *twitterCloneServer) GetPost(ctx context.Context, req *pb.GetPostRequest
 	}
 
 	return s.postConv.ToPb(post), nil
+}
+
+func (s *twitterCloneServer) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.User, error) {
+	user, err := s.usersUsecase.Get(ctx, req.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+
+	return s.userConv.ToPb(user), nil
+}
+
+func (s *twitterCloneServer) GetUserByPostID(ctx context.Context, req *pb.GetUserByPostIDRequest) (*pb.User, error) {
+	user, err := s.usersUsecase.GetUserByPostID(ctx, req.GetPostId())
+	if err != nil {
+		return nil, err
+	}
+
+	return s.userConv.ToPb(user), nil
 }
 
 func (s *twitterCloneServer) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*empty.Empty, error) {

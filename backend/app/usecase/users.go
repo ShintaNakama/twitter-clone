@@ -9,6 +9,8 @@ import (
 
 type UsersUsecase interface {
 	CreateUser(ctx context.Context, input *UserInput) error
+	Get(ctx context.Context, userID string) (*User, error)
+	GetUserByPostID(ctx context.Context, postID string) (*User, error)
 }
 
 type usersUsecase struct {
@@ -34,6 +36,34 @@ func (u *usersUsecase) CreateUser(ctx context.Context, input *UserInput) error {
 	}
 
 	return nil
+}
+
+func (u *usersUsecase) Get(ctx context.Context, id string) (*User, error) {
+	user, err := u.repo.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &User{
+		ID:    user.GetID(),
+		Email: user.GetEmail(),
+		Name:  user.GetName(),
+		Image: user.GetImage(),
+	}, nil
+}
+
+func (u *usersUsecase) GetUserByPostID(ctx context.Context, postID string) (*User, error) {
+	user, err := u.repo.GetUserByPostID(ctx, postID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &User{
+		ID:    user.GetID(),
+		Email: user.GetEmail(),
+		Name:  user.GetName(),
+		Image: user.GetImage(),
+	}, nil
 }
 
 type UserInput struct {

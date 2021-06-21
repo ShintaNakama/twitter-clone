@@ -1,12 +1,8 @@
 overwrite: true
+documents: frontend/src/**/*.graphql
 generates:
-  frontend/src/generated/graphql.tsx:
+  frontend/src/graphql/index.ts:
     schema: "graphql_schema/*.graphql"
-    documents:
-      #- "frontend/src/pages/**/*.{graphql}"
-      #- "frontend/src/components/**/*.{graphql}"
-      #- "frontend/src/hooks/**/*.{graphql}"
-      #- "frontend/src/graphql/**/*.{graphql}"
     plugins:
       - "typescript"
       - "typescript-operations"

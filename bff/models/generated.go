@@ -2,16 +2,6 @@
 
 package models
 
-// post
-type Post struct {
-	// ID
-	ID string `json:"id"`
-	// ユーザー
-	User *User `json:"user"`
-	// 本文
-	Body string `json:"body"`
-}
-
 // post input
 type PostInput struct {
 	// ID
@@ -20,18 +10,6 @@ type PostInput struct {
 	UserID string `json:"userID"`
 	// 本文
 	Body string `json:"body"`
-}
-
-// user
-type User struct {
-	// ID
-	ID string `json:"id"`
-	// email
-	Email string `json:"email"`
-	// name
-	Name string `json:"name"`
-	// image
-	Image string `json:"image"`
 }
 
 // user input

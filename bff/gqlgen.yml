@@ -14,3 +14,9 @@ models:
       - github.com/99designs/gqlgen/graphql.Int32
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int
+  User:
+    model:
+      - github.com/ShintaNakama/twitter-clone/bff/models.User
+  Post:
+    model:
+      - github.com/ShintaNakama/twitter-clone/bff/models.Post

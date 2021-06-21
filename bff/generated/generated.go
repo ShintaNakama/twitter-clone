@@ -36,6 +36,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Mutation() MutationResolver
+	Post() PostResolver
 	Query() QueryResolver
 }
 
@@ -72,6 +73,9 @@ type MutationResolver interface {
 	CreateUser(ctx context.Context, input *models.UserInput) (bool, error)
 	CreatePost(ctx context.Context, input *models.PostInput) (bool, error)
 	DeletePost(ctx context.Context, id string) (bool, error)
+}
+type PostResolver interface {
+	User(ctx context.Context, obj *models.Post) (*models.User, error)
 }
 type QueryResolver interface {
 	PostList(ctx context.Context) ([]*models.Post, error)
@@ -665,14 +669,14 @@ func (ec *executionContext) _Post_user(ctx context.Context, field graphql.Collec
 		Object:     "Post",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.User, nil
+		return ec.resolvers.Post().User(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2242,17 +2246,26 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._Post_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "user":
-			out.Values[i] = ec._Post_user(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Post_user(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "body":
 			out.Values[i] = ec._Post_body(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -2704,6 +2717,10 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNUser2githubᚗcomᚋShintaNakamaᚋtwitterᚑcloneᚋbffᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v models.User) graphql.Marshaler {
+	return ec._User(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋShintaNakamaᚋtwitterᚑcloneᚋbffᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v *models.User) graphql.Marshaler {
